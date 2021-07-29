@@ -14,4 +14,14 @@ object Sessions {
       oAuthToken: OAuth2.oAuthToken = new OAuth2.oAuthToken,
       loggedInAt: LocalDateTime = LocalDateTime.now()
   )
+
+  def cleanUpExpiredUsers(): Unit =
+    loggedInUsers
+      .filter(user =>
+        user.loggedInAt
+          .plusSeconds(user.oAuthToken.expires_in)
+          .isBefore(LocalDateTime.now())
+      )
+      .foreach(loggedInUsers -= _)
+
 }

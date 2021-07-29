@@ -25,6 +25,11 @@ object WebServer extends HttpApp with StrictLogging {
   implicit val formats: DefaultFormats.type      = DefaultFormats
   implicit val serialization: Serialization.type = native.Serialization
 
+  override def postHttpBinding(binding: Http.ServerBinding): Unit = {
+    systemReference.get().scheduler.schedule(1 minutes, 1 minutes)(Sessions.cleanUpExpiredUsers())(systemReference.get().dispatcher)
+    super.postHttpBinding(binding)
+  }
+
   override protected def routes: Route =
     pathEndOrSingleSlash {
       get {
