@@ -14,7 +14,7 @@ object WebServer extends HttpApp with StrictLogging {
   override protected def routes: Route =
     pathEndOrSingleSlash{
       get {
-        complete("Welcome")
+        complete("Welcome. Server is running")
       }
     }
 }
