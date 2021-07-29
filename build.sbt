@@ -10,4 +10,3 @@ lazy val root = (project in file("."))
     name := "Day01-oauth2-akka",
     libraryDependencies ++= Dependencies.appDependencies
   )
-
