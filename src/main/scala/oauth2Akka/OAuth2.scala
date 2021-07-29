@@ -7,7 +7,7 @@ object OAuth2 {
   case class oAuthToken(
       access_token: String = java.util.UUID.randomUUID().toString,
       token_type: String = "bearer",
-      expires_in: Int = 3600
+      expires_in: Int = sys.env.getOrElse("TOKEN_EXPIRSE_AFTER_SECONDS", "10").toInt
   )
 
   def oAuthAuthenticator(credentials: Credentials): Option[Sessions.LoggedInUser] =
