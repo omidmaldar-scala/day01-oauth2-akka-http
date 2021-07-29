@@ -39,5 +39,10 @@ object WebServer extends HttpApp with StrictLogging {
             complete(loggedInUser.oAuthToken)
           }
         }
+      } ~
+      path("api") {
+        authenticateOAuth2(realm = "api", OAuth2.oAuthAuthenticator) { validToken =>
+          complete(s"It's working. User token is $validToken")
+        }
       }
 }
