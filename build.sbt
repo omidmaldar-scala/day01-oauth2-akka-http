@@ -8,6 +8,6 @@ ThisBuild / organizationName := "dive-into-scala"
 lazy val root = (project in file("."))
   .settings(
     name := "Day01-oauth2-akka",
-    libraryDependencies += scalaTest % Test
+    libraryDependencies ++= Dependencies.appDependencies
   )
 
