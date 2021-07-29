@@ -2,17 +2,16 @@ package oauth2Akka
 
 import akka.http.scaladsl.server._
 import com.typesafe.scalalogging.StrictLogging
-import java.time.LocalDateTime
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.directives.Credentials
 import org.json4s.native.Serialization
 import org.json4s.{DefaultFormats, native}
 
-import scala.collection.mutable
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-import java.time.LocalDateTime
+
+import oauth2Akka.BasicAuth
+import oauth2Akka.Sessions
 
 
 object Main {
@@ -35,42 +34,12 @@ object WebServer extends HttpApp with StrictLogging {
       }
     }~
       path("auth") {
-        authenticateBasic(realm = "auth", BasicAuthAuthenticator) { user =>
+        authenticateBasic(realm = "auth", BasicAuth.BasicAuthAuthenticator) { user =>
           get {
-            val loggedInUser = LoggedInUser(user)
-            loggedInUsers.append(loggedInUser)
+            val loggedInUser = Sessions.LoggedInUser(user)
+            Sessions.loggedInUsers.append(loggedInUser)
             complete(loggedInUser.oAuthToken)
           }
         }
       }
-  
-  case class BasicAuthCredentials(username: String, password: String)
-
-  // TODO: Load this from an external resource
-  private val validBasicAuthCredentials = Seq(
-    BasicAuthCredentials("user1", "pass1"), 
-    BasicAuthCredentials("user2", "pass2") 
-  )
-
-  private def BasicAuthAuthenticator(credentials: Credentials) =
-    credentials match {
-      case p @ Credentials.Provided(_) =>
-         validBasicAuthCredentials
-          .find(user => user.username == p.identifier && p.verify(user.password))
-      case _ => None
-    }
-
-  // Kepp in a permanent storage
-  private val loggedInUsers = mutable.ArrayBuffer.empty[LoggedInUser] 
-
-  case class oAuthToken(access_token : String = java.util.UUID.randomUUID().toString,
-                          token_type: String = "bearer", 
-                          expires_in: Int = 3600
-  )
-  
-  case class LoggedInUser(basicAuthCredentials: BasicAuthCredentials,
-                        oAuthToken: oAuthToken = new oAuthToken,
-                        loggedInAt: LocalDateTime = LocalDateTime.now()
-  )
-
 }
