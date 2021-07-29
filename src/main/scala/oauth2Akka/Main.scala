@@ -1,9 +1,20 @@
 package oauth2Akka
 
-object Main extends Greeting with App {
-  println(greeting)
+import akka.http.scaladsl.server._
+import com.typesafe.scalalogging.StrictLogging
+
+object Main {
+  def main(args: Array[String]): Unit = {
+    val port: Int = sys.env.getOrElse("PORT", "8080").toInt
+    WebServer.startServer("0.0.0.0", port)
+  }
 }
 
-trait Greeting {
-  lazy val greeting: String = "hello"
+object WebServer extends HttpApp with StrictLogging {
+  override protected def routes: Route =
+    pathEndOrSingleSlash{
+      get {
+        complete("Welcome. Server is running")
+      }
+    }
 }
